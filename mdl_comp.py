@@ -1,6 +1,6 @@
 import scipy
 import numpy as np 
-# Code ref: https://github.com/csinva/mdl-complexity
+# Code ref: https://github.com/csinva/mdl-complexity (Dwivedi et al. Revisiting minimum description length complexity in overparameterized models)
 
 def prac_mdl_comp(X_train, y_train, variance=1):
     '''Calculate prac-mdl-comp for this dataset
