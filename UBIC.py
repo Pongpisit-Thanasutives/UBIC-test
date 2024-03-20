@@ -49,7 +49,7 @@ def baye_uncertainties(best_subsets, dataset, u_type='var', take_sqrt=True, ridg
         err = yy-Phi@w
         # By MLE, we have variance_y written as follows:
         variance_y = np.mean(err**2)
-        if unbiased: variance_y*len(err)/(len(err)-com)
+        if unbiased: variance_y = variance_y*len(err)/(len(err)-com)
         w = w[np.abs(w)>0].reshape((com, 1))
 
         # prior_mean = np.zeros((com, 1))
