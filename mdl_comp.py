@@ -1,5 +1,6 @@
 import scipy
 import numpy as np 
+from sklearn.base import BaseEstimator
 # Code ref: https://github.com/csinva/mdl-complexity (Dwivedi et al. Revisiting minimum description length complexity in overparameterized models)
 
 def prac_mdl_comp(X_train, y_train, variance=1):
@@ -33,4 +34,18 @@ def redundancy(X_train, l):
     eigenvals, eigenvecs = np.linalg.eig(X_train.T @ X_train)
     eigensum = 0.5 * np.sum(np.log((eigenvals + l) / l))
     return eigensum
+
+class RidgeMDLCOMP(BaseEstimator):
+
+    def __init__(self):
+        super().__init__()
+
+    def fit(self, X: np.ndarray, y: np.ndarray):
+        stats = prac_mdl_comp(X, y)
+        self.theta = stats['thetahat']
+        self.lambda_opt = stats['lambda_opt']
+        self.prac_mdl = stats['prac_mdl']
+
+    def predict(self, X):
+        return X @ self.theta
 
