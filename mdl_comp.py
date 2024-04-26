@@ -36,16 +36,18 @@ def redundancy(X_train, l):
     return eigensum
 
 class RidgeMDLCOMP(BaseEstimator):
-
     def __init__(self):
         super().__init__()
+        self.coef_ = None
+        self.lambda_opt = None
+        self.prac_mdl = None
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         stats = prac_mdl_comp(X, y)
-        self.theta = stats['thetahat']
+        self.coef_ = stats['thetahat']
         self.lambda_opt = stats['lambda_opt']
         self.prac_mdl = stats['prac_mdl']
 
     def predict(self, X):
-        return X @ self.theta
+        return X@self.theta
 
