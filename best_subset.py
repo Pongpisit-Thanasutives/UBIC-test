@@ -523,18 +523,19 @@ class L0BNB(ps.optimizers.BaseOptimizer):
     def __init__(self, max_nonzeros=None, lam=1e-2, threshold=0.0, is_normal=False, normalize_columns=False):
         try: super(L0BNB, self).__init__(fit_intercept=False, copy_X=True, normalize_columns=normalize_columns)
         except TypeError: super(L0BNB, self).__init__(copy_X=True, normalize_columns=normalize_columns)
+        if isinstance(max_nonzeros, int) or isinstance(max_nonzeros, float):
+            max_nonzeros = [int(max_nonzeros)]
         self.max_nonzeros = max_nonzeros
         self.lam = lam
         self.threshold = threshold
         self.is_normal = is_normal
     def _reduce(self, x, y):
-        # Old and wrong code
-#        self.coef_ = bnb(x, y.ravel(), self.max_nonzeros, lam=self.lam, normalize=self.is_normal, 
-#                corrected_coefficients=True, return_only_max_nonzeros=True).reshape(1, -1)
-#        self.ind_ = [self.coef_ != 0.0]
+        if len(self.max_nonzeros) == 1:
+            self.max_nonzeros *= y.shape[-1]
+        assert len(self.max_nonzeros) == 1 or len(self.max_nonzeros) == y.shape[-1]
         sols = []
         for i in range(y.shape[-1]):
-            sol = bnb(x, y[:,i:i+1].ravel(), self.max_nonzeros, lam=self.lam, threshold=self.threshold, 
+            sol = bnb(x, y[:,i:i+1].ravel(), self.max_nonzeros[i], lam=self.lam, threshold=self.threshold, 
                     normalize=self.is_normal,  corrected_coefficients=True, return_only_max_nonzeros=True).reshape(1, -1)
             sols.append(sol)
         self.coef_ = np.vstack(sols)
@@ -554,14 +555,19 @@ class BESS(ps.optimizers.BaseOptimizer):
 
 class BruteForceRegressor(ps.optimizers.BaseOptimizer):
     def __init__(self, support_size=None, include=(), top=1, normalize_columns=False):
-        super(BruteForceRegressor, self).__init__(fit_intercept=False, copy_X=True, normalize_columns=normalize_columns)
+        super(BruteForceRegressor, self).__init__(copy_X=True, normalize_columns=normalize_columns)
+        if isinstance(support_size, int) or isinstance(support_size, float):
+            support_size = [int(support_size)]
         self.support_size = support_size
         self.include = include
         self.top = top
     def _reduce(self, x, y):
-        coef = brute_force(x, y, support_size=self.support_size, include=self.include, top=self.top)
-        self.coef_ = coef.flatten()
-        self.ind_ = [self.coef_ != 0.0]
+        sols = []
+        for i in range(y.shape[-1]):
+            sol = brute_force(x, y[:,i:i+1], support_size=self.support_size[i], include=self.include, top=self.top)
+            sols.append(sol.ravel())
+        self.coef_ = np.array(sols)
+        self.ind_ = [self.coef_ != 0.0 for c in self.coef_]
 
 class CandidateLibrary(ps.optimizers.BaseOptimizer):
     def __init__(self, kwargs={'fit_intercept':False, 'copy_X':True, 'normalize_columns':False}):
