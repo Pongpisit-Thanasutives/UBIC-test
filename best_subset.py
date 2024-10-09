@@ -592,7 +592,7 @@ def convert2latex(text):
             s[i] = re.sub('u+', f"u^{u}", s[i])
     return ''.join(s)
 
-def ps_features(target, time, feature_library, kwargs={'fit_intercept':False, 'copy_X':True, 'normalize_columns':False}, optimizer=CandidateLibrary, differentiation_method=None, center_output=False, feature_names=['u'], get_latex=True):
+def ps_features(target, time, feature_library, kwargs={'copy_X':True, 'normalize_columns':False}, optimizer=CandidateLibrary, differentiation_method=None, center_output=False, expand_dims=True, feature_names=['u'], get_latex=False):
     opt = optimizer(kwargs)
     if differentiation_method is None:
         if hasattr(feature_library, "differentiation_method") and hasattr(feature_library, "differentiation_kwargs"):
@@ -601,12 +601,15 @@ def ps_features(target, time, feature_library, kwargs={'fit_intercept':False, 'c
             # print("differentiation method or differentiation_kwargs is not implemented in feature_library.")
             pass
     cl = ps.SINDy(feature_library=feature_library, optimizer=opt, differentiation_method=differentiation_method, feature_names=feature_names)
-    if len(target.shape) < 3: target = np.expand_dims(target, -1)
+    if expand_dims and len(target.shape) < 3: 
+        target = np.expand_dims(target, -1)
     cl.fit(target, t=time)
     X_pre, y_pre = cl.optimizer.preprocessed_data
     if center_output:
         y_pre = y_pre - y_pre.mean(axis=0)
-    # Bugs for convert2latex (unfixed)
-    if get_latex: return X_pre, y_pre, list(map(convert2latex, feature_library.get_feature_names()))
-    else: return X_pre, y_pre, feature_library.get_feature_names()
+    # Bugs for convert2latex (unfixed), only works with PDEs?
+    if get_latex: 
+        return X_pre, y_pre, list(map(convert2latex, feature_library.get_feature_names()))
+    else: 
+        return X_pre, y_pre, feature_library.get_feature_names()
 
