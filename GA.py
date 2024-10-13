@@ -315,7 +315,7 @@ class GGA():
             self.Chrom=Chrom
             self.Chrom_diff=Chrom_diff
 
-    # main functionality?
+    # main functionality
     def evolution(self):
         self.Chrom = []
         self.Chrom_diff=[]
