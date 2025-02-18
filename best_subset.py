@@ -509,6 +509,8 @@ class ScoreTracker(object):
             if self.track[k][-1] > a_track[k][-1]: 
                 self.track[k] = a_track[k]
         return self.get_track()
+    def get_best_subsets(self,):
+        return sorted([self.track[e][0] for e in self.track], key=len)
 
 class ABESS(ps.optimizers.BaseOptimizer):
     def __init__(self, abess_kw=None, group=None, is_normal=False, normalize_columns=False):
