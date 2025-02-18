@@ -27,13 +27,16 @@ from statsmodels.tools.eval_measures import aicc as sm_aicc
 from statsmodels.tools.eval_measures import hqic as sm_hqic
     
 import pysindy as ps
+from tqdm import trange
+
 try:
     from l0bnb import fit_path
+except ImportError:
+    print("L0BnB is not installed.")
+try:
     from abess.linear import LinearRegression
 except ImportError:
-    print("Complete best-subset solvers are not installed.")
-
-from tqdm import trange
+    print("ABESS is not installed.")
 
 def composite_function(*func, left2right=False):
     def compose(f, g, left2right=left2right):
