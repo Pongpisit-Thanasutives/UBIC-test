@@ -51,12 +51,13 @@ def baye_uncertainties(best_subsets, dataset, u_type='var', take_sqrt=True, ridg
         variance_y = np.mean(err**2)
         w = w.reshape(-1, 1) # w = w[np.abs(w)>0].reshape((com, 1))
 
-        # prior_mean = np.zeros((com, 1))
         prior_mean = w
         prior_cov = np.identity(com)
-        if ridge_lambda > 0: prior_cov = (variance_y/ridge_lambda)*prior_cov
-        prior_cov_inv = np.linalg.pinv(prior_cov)
+        if ridge_lambda > 0: 
+            prior_mean = np.zeros(w.shape)
+            prior_cov = (variance_y/ridge_lambda)*prior_cov
 
+        prior_cov_inv = np.linalg.pinv(prior_cov)
         posterior_cov = variance_y*np.linalg.pinv(variance_y * prior_cov_inv + Phi.T@Phi)
         posterior_mean = posterior_cov@(prior_cov_inv@prior_mean + (Phi.T@yy)/variance_y)
         if threshold is not None:
