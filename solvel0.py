@@ -144,6 +144,8 @@ def solvel0(X_pre, y_pre, is_normal=False, intercept=False, miosr=False, refine=
             else:
                 beta = miqp3(X_pre, y_pre.flatten(), i)
         effective_indices = tuple(np.where(np.abs(beta)>0)[0])
+        if i == X_pre.shape[1]:
+            effective_indices = tuple(range(X_pre.shape[1]))
         if len(effective_indices) > 0:
             out.add(effective_indices)
 
