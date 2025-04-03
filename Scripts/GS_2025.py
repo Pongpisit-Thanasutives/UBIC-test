@@ -96,6 +96,6 @@ weak_lib = ps.WeakPDELibrary(
 X_pre = weak_lib.fit_transform(u)
 y_pre = weak_lib.convert_u_dot_integral(u)
 
-np.save("X_pre_GS_2025.npy", X_pre)
-np.save("y_pre_GS_2025.npy", y_pre)
+np.save("X_weak10000_GS_2025.npy", X_pre)
+np.save("y_weak10000_GS_2025.npy", y_pre)
 
