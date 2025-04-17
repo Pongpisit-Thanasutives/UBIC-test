@@ -148,6 +148,8 @@ def solvel0(X_pre, y_pre, is_normal=False, intercept=False, miosr=False, refine=
             effective_indices = tuple(range(X_pre.shape[1]))
         if len(effective_indices) > 0:
             out.add(effective_indices)
+        if len(effective_indices) > max_complexity:
+            refine = True
 
     # Added backward_refinement capability
     if refine:
