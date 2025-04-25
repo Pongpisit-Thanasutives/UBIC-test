@@ -32,9 +32,10 @@ def BIC_AIC(prediction, ground, nparams, reg_func=lambda x:x):
     llf = log_like_value(prediction, ground)
     return -2*llf + np.log(ground.shape[0])*nparams, -2*llf + 2*nparams
 
-def baye_uncertainties(best_subsets, dataset, u_type='var', take_sqrt=True, ridge_lambda=0, threshold=None):
+def baye_uncertainties(best_subsets, dataset, u_type='var', take_sqrt=True, ridge_lambda=0, threshold=None, l1_ratio=1.0):
     # if you want u_type='std', then call u_type='var' and take_sqrt=True
     XX, yy = dataset
+    assert 0 <= l1_ratio <= 1
     assert u_type == 'var' or 'cv' in u_type
     assert len(XX) == len(yy)
     yy = yy.reshape(-1, 1)
@@ -78,7 +79,10 @@ def baye_uncertainties(best_subsets, dataset, u_type='var', take_sqrt=True, ridg
             code = u_type.replace('cv', '')
             if len(code) == 0: order = 1
             else: order = int(u_type.replace('cv', ''))
-            mm = np.linalg.norm(mm[:, 0], ord=order)
+            if order == 1 and 0 < l1_ratio < 1:
+                mm = l1_ratio*np.linalg.norm(mm[:, 0], ord=1) + (1-l1_ratio)*np.linalg.norm(mm[:, 0], ord=2)**2
+            else:
+                mm = np.linalg.norm(mm[:, 0], ord=order)
             ss = np.linalg.norm(ss, ord=order)
             uns.append(ss/mm)
 
